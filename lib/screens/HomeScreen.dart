@@ -1,10 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterdarklightmode/main.dart';
 import 'package:flutterdarklightmode/provider/languageprovider.dart';
 import 'package:localization/localization.dart';
 import 'package:provider/provider.dart';
-
 import '../provider/themeprovider.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -17,7 +14,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    final themeChange = Provider.of<DarkThemeProvider>(context);
     final locale = Localizations.localeOf(context);
     return Scaffold(
       appBar: AppBar(title: Text("home-title".i18n([locale.toString()]))),
@@ -25,7 +21,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            themeChange.darkTheme
+            context.watch<DarkThemeProvider>().darkTheme
                 ? const Text(
                     'Teal Accent',
                     style: TextStyle(color: Colors.tealAccent),
@@ -35,10 +31,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     style: TextStyle(color: Colors.red),
                   ),
             Checkbox(
-              value: themeChange.darkTheme,
+              value: context.watch<DarkThemeProvider>().darkTheme,
               shape: const CircleBorder(),
               onChanged: (bool? value) {
-                themeChange.darkTheme = value!;
+                context.read<DarkThemeProvider>().updateTheme(value!);
               },
             ),
             ElevatedButton(

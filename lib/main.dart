@@ -14,6 +14,9 @@ void main() {
           ChangeNotifierProvider<LanguageProvider>(
             create: (_) => LanguageProvider(),
           ),
+          ChangeNotifierProvider<DarkThemeProvider>(
+            create: (_) => DarkThemeProvider(),
+          ),
         ],
         builder: (context, child) {
           return const MyApp();
@@ -38,39 +41,35 @@ class MyAppState extends State<MyApp> {
   }
 
   void getCurrentAppTheme() async {
-    themeChangeProvider.darkTheme =
-        await themeChangeProvider.darkThemePreference.getTheme();
+    context.read<DarkThemeProvider>().updateTheme(
+          await themeChangeProvider.darkThemeSharedPreference.getTheme(),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
     LocalJsonLocalization.delegate.directories = ['lib/i18n'];
-    return ChangeNotifierProvider(
-      create: (_) {
-        return themeChangeProvider;
-      },
-      child: Consumer<DarkThemeProvider>(
-        builder: (context, ref, child) {
-          return MaterialApp(
-            locale: context.watch<LanguageProvider>().currentLocale,
-            localizationsDelegates: [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-              LocalJsonLocalization.delegate,
-            ],
-            supportedLocales: const [
-              Locale('en', ''), // English, no country code
-              Locale('pt', ''), // Spanish, no country code
-            ],
-            title: 'Dark&light Mode',
-            theme: Styles.themeData(themeChangeProvider.darkTheme, context),
-            // darkTheme: ThemeData.dark(),
-            home: const MyHomePage(),
-            debugShowCheckedModeBanner: false,
-          );
-        },
-      ),
+
+    return MaterialApp(
+      title: 'Dark&light Mode',
+      debugShowCheckedModeBanner: false,
+      //localisation
+      locale: context.watch<LanguageProvider>().currentLocale,
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        LocalJsonLocalization.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', ''), // English, no country code
+        Locale('pt', ''), // Spanish, no country code
+      ],
+
+      //theme
+      theme: Styles.themeData(
+          context.watch<DarkThemeProvider>().darkTheme, context),
+      home: const MyHomePage(),
     );
   }
 }
